@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload Form</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('https://media.istockphoto.com/id/1148136779/photo/background-002.webp?b=1&s=170667a&w=0&k=20&c=g3vfzWPilxeiFoX9RNjk2VSgeK7yo1k2AiVdL4QP2ak=');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #form-container {
+      border: 2px solid black;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: white;
+      text-align: center;
+    }
+
+    #file-input {
+      margin-bottom: 10px;
+    }
+
+    #response-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="form-container">
+        <h3> Upload File and Description :  </h3 br>
+      <input type="file" id="file-input">
+      <input type="text" id="description" placeholder="Description">
+      <button id="submit-btn">Submit</button>
+      <div id="response-container"></div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const fileInput = document.getElementById("file-input");
+      const descriptionInput = document.getElementById("description");
+      const submitBtn = document.getElementById("submit-btn");
+      const responseContainer = document.getElementById("response-container");
+
+      submitBtn.addEventListener("click", async function () {
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        formData.append("desc", descriptionInput.value);
+
+        try {
+          const response = await fetch("http://localhost:8001/check-resume", {
+            method: "POST",
+            body: formData,
+          });
+          const responseData = await response.json();
+
+          responseContainer.innerHTML = `
+            <h3>Analysis :</h3>
+            <p>Total Keywords: ${responseData.totalKeywords.join(", ")}</p>
+            <p>Unmatched Keywords: ${responseData.unMatchedKeywords.join(", ")}</p>
+            <p>Match Percentage: ${responseData.matchPercentage}</p>
+          `;
+        } catch (error) {
+          console.error("Error sending data:", error);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
